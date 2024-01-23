@@ -360,7 +360,8 @@ class StyleTTS2:
                                beta=0.7,
                                t=0.7,
                                diffusion_steps=5,
-                               embedding_scale=1):
+                               embedding_scale=1,
+                               phonemize=True):
         """
         Performs inference for segment of longform text; see long_inference()
         :param text: Input text
@@ -371,15 +372,19 @@ class StyleTTS2:
         :param t: Determines consistency of style across inference segments (0 lowest, 1 highest)
         :param diffusion_steps: The more the steps, the more diverse the samples are, with the cost of speed.
         :param embedding_scale: Higher scale means style is more conditional to the input text and hence more emotional.
+        :param phonemize: Phonemize text? If not, expects that text is already phonemized
         :return: audio data as a Numpy array
         """
-        text = text.strip()
-        text = text.replace('"', '')
-        phonemized_text = self.phoneme_converter.phonemize(text)
-        ps = word_tokenize(phonemized_text)
-        phoneme_string = ' '.join(ps)
-        phoneme_string = phoneme_string.replace('``', '"')
-        phoneme_string = phoneme_string.replace("''", '"')
+        if phonemize:
+            text = text.strip()
+            text = text.replace('"', '')
+            phonemized_text = self.phoneme_converter.phonemize(text)
+            ps = word_tokenize(phonemized_text)
+            phoneme_string = ' '.join(ps)
+            phoneme_string = phoneme_string.replace('``', '"')
+            phoneme_string = phoneme_string.replace("''", '"')
+        else:
+            phoneme_string = text
 
         textcleaner = TextCleaner()
         tokens = textcleaner(phoneme_string)
