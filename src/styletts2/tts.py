@@ -361,7 +361,8 @@ class StyleTTS2:
                                t=0.7,
                                diffusion_steps=5,
                                embedding_scale=1,
-                               phonemize=True):
+                               phonemize=True,
+                               speed=1.0,):
         """
         Performs inference for segment of longform text; see long_inference()
         :param text: Input text
@@ -373,6 +374,7 @@ class StyleTTS2:
         :param diffusion_steps: The more the steps, the more diverse the samples are, with the cost of speed.
         :param embedding_scale: Higher scale means style is more conditional to the input text and hence more emotional.
         :param phonemize: Phonemize text? If not, expects that text is already phonemized
+        :param speed: Speech rate (higher = faster, default: 1.0)
         :return: audio data as a Numpy array
         """
         if phonemize:
@@ -423,7 +425,7 @@ class StyleTTS2:
             x, _ = self.model.predictor.lstm(d)
             duration = self.model.predictor.duration_proj(x)
 
-            duration = torch.sigmoid(duration).sum(axis=-1)
+            duration = torch.sigmoid(duration).sum(axis=-1) / speed
             pred_dur = torch.round(duration.squeeze()).clamp(min=1)
 
 
